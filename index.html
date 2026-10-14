@@ -470,6 +470,12 @@ table.rt td small{display:block;font-size:10px;color:var(--ink-3)}table.rt tr.fi
 /* iOS uygulama: kaydırmayı sayfa yerine gövde yapar — üst/alt bar sabit kalır, esneme yok */
 html{height:100%;overflow:hidden}
 body{height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
+
+/* üst bar: aşağı kaydırınca gizlen, yukarı kaydırınca gel */
+.top{transition:transform .25s ease;will-change:transform}
+.top.hid{transform:translateY(-100%)}
+.sfsafe{position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:#050811;z-index:7;pointer-events:none}
+.nav::after{content:'';position:absolute;left:0;right:0;top:100%;height:80px;background:#090d1a}
 </style>
 
 <header class="top">
@@ -3437,5 +3443,16 @@ Object.assign(EN,{'Teknoloji ağacı':'Tech tree','Liste':'List','Araştırma a�
  'Nano montajcılar. Her seviye bina ve tersane sürelerini %6 kısaltır (en fazla %60)':'Nano assemblers. Each level cuts building and shipyard times by 6% (max 60%)'});
 I18N_RE=null;I18N_CACHE.clear();
 boot();
+})();
+</script>
+<script>
+(function(){const d=document.createElement('div');d.className='sfsafe';document.body.appendChild(d);
+ let last=0,acc=0;const sc=()=>document.body.scrollTop||document.documentElement.scrollTop||0;
+ const on=()=>{const tp=document.querySelector('.top');if(!tp)return;const y=sc(),dy=y-last;last=y;
+  if(y<40){tp.classList.remove('hid');acc=0;return}
+  acc=(Math.sign(dy)===Math.sign(acc))?acc+dy:dy;
+  if(acc>24)tp.classList.add('hid');else if(acc<-24)tp.classList.remove('hid')};
+ document.body.addEventListener('scroll',on,{passive:true});window.addEventListener('scroll',on,{passive:true});
+ document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.nav')){const tp=document.querySelector('.top');tp&&tp.classList.remove('hid');last=0}},true);
 })();
 </script>
